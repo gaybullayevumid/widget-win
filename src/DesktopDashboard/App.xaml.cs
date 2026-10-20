@@ -33,8 +33,8 @@ public partial class App : Application
         services.AddSingleton<IMetricSource<CpuSample>, CpuSource>();
         services.AddSingleton<IMetricSource<MemorySample>, MemorySource>();
         services.AddSingleton<IMetricSource<GpuSample>, NotImplementedSource<GpuSample>>();
-        services.AddSingleton<IMetricSource<BatterySample>, NotImplementedSource<BatterySample>>();
-        services.AddSingleton<IMetricSource<NetworkSample>, NotImplementedSource<NetworkSample>>();
+        services.AddSingleton<IMetricSource<BatterySample>, BatterySource>();
+        services.AddSingleton<IMetricSource<NetworkSample>, NetworkSource>();
         services.AddSingleton<SystemMonitor>();
 
         services.AddSingleton<ClockViewModel>();
