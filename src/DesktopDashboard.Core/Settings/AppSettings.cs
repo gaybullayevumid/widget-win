@@ -71,6 +71,9 @@ public sealed class AppSettings
 
     public bool ShowSeconds { get; set; } = true;
 
+    /// <summary>GPU adapter name to show, or null for the one with the most dedicated memory.</summary>
+    public string? GpuAdapter { get; set; }
+
     /// <summary>Clamps values that may have been hand-edited in the JSON file.</summary>
     public AppSettings Normalize()
     {

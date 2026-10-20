@@ -13,6 +13,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private const double BaseCardHeight = 120;
 
     private readonly SystemMonitor _monitor;
+    private readonly GpuSource _gpuSource;
     private readonly SettingsService _settings;
     private readonly DispatcherQueue _dispatcher;
     private readonly CpuCardViewModel _cpu = new();
@@ -23,9 +24,10 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     private readonly CardViewModel[] _allCards;
     private int _pendingSnapshot;
 
-    public DashboardViewModel(SystemMonitor monitor, SettingsService settings, ClockViewModel clock, DispatcherQueue dispatcher)
+    public DashboardViewModel(SystemMonitor monitor, GpuSource gpuSource, SettingsService settings, ClockViewModel clock, DispatcherQueue dispatcher)
     {
         _monitor = monitor;
+        _gpuSource = gpuSource;
         _settings = settings;
         _dispatcher = dispatcher;
         Clock = clock;
@@ -106,6 +108,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
         if (settings.Cards.Battery) visible |= MetricKind.Battery;
         if (settings.Cards.Network) visible |= MetricKind.Network;
 
+        _gpuSource.PreferredAdapter = settings.GpuAdapter;
         _monitor.Enabled = visible;
         _monitor.Interval = TimeSpan.FromMilliseconds(settings.PollIntervalMs);
         SyncCards(visible);

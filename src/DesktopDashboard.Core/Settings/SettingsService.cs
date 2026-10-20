@@ -30,6 +30,16 @@ public sealed class SettingsService : IDisposable
 
     public void Update(Action<AppSettings> change)
     {
+        UpdateSilently(change);
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Persists a change without raising <see cref="Changed"/>, for state nobody needs to react to
+    /// (e.g. the window position, which changes many times per second while dragging).
+    /// </summary>
+    public void UpdateSilently(Action<AppSettings> change)
+    {
         lock (_gate)
         {
             change(Current);
@@ -37,8 +47,6 @@ public sealed class SettingsService : IDisposable
             _dirty = true;
             _saveTimer.Change(SaveDelay, Timeout.InfiniteTimeSpan);
         }
-
-        Changed?.Invoke(this, EventArgs.Empty);
     }
 
     public void Flush()

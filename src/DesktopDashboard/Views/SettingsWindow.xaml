@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="DesktopDashboard.Views.SettingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:DesktopDashboard.Controls"
+    xmlns:views="using:DesktopDashboard.Views"
+    xmlns:vm="using:DesktopDashboard.ViewModels"
+    Title="Dashboard settings">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid x:Name="Root">
+        <Grid.Resources>
+            <Style x:Key="SectionHeaderStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
+                <Setter Property="Margin" Value="2,20,0,6" />
+            </Style>
+            <Style TargetType="ComboBox" BasedOn="{StaticResource DefaultComboBoxStyle}">
+                <Setter Property="MinWidth" Value="180" />
+            </Style>
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel x:Name="TitleBar" Orientation="Horizontal" Spacing="12" Padding="16,0,0,0" VerticalAlignment="Stretch">
+            <Image Source="ms-appx:///Assets/AppIcon.ico" Width="16" Height="16" VerticalAlignment="Center" />
+            <TextBlock Text="Dashboard settings" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1">
+            <StackPanel MaxWidth="760" Padding="28,0,28,28" Spacing="4">
+                <TextBlock Text="Settings" Style="{StaticResource TitleTextBlockStyle}" Margin="0,4,0,0" />
+
+                <!-- Appearance -->
+                <TextBlock Text="Appearance" Style="{StaticResource SectionHeaderStyle}" />
+                <controls:SettingsRow Header="Theme" Description="Light, dark, or follow Windows" Glyph="&#xE790;">
+                    <ComboBox SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}">
+                        <x:String>Use system setting</x:String>
+                        <x:String>Light</x:String>
+                        <x:String>Dark</x:String>
+                    </ComboBox>
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Material" Description="Acrylic shows the desktop through the widget; Mica tints with the wallpaper" Glyph="&#xE81E;">
+                    <ComboBox SelectedIndex="{x:Bind ViewModel.BackdropIndex, Mode=TwoWay}">
+                        <x:String>Acrylic</x:String>
+                        <x:String>Mica</x:String>
+                        <x:String>Solid</x:String>
+                    </ComboBox>
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Opacity" Description="How solid the widget background is" Glyph="&#xE706;">
+                    <Slider Width="200" Minimum="20" Maximum="100" StepFrequency="5" TickFrequency="20" TickPlacement="Outside"
+                            Value="{x:Bind ViewModel.OpacityPercent, Mode=TwoWay}"
+                            IsEnabled="{x:Bind ViewModel.IsOpacityEnabled, Mode=OneWay}" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Accent color" Description="Used for icons, charts and the seconds" Glyph="&#xE2B1;">
+                    <ComboBox ItemsSource="{x:Bind ViewModel.Swatches}" SelectedIndex="{x:Bind ViewModel.AccentIndex, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AccentSwatch">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Ellipse Width="14" Height="14" Fill="{x:Bind views:SettingsWindow.SwatchBrush(Hex)}" />
+                                    <TextBlock Text="{x:Bind Name}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Widget size" Description="Scales cards and text" Glyph="&#xE740;">
+                    <ComboBox SelectedIndex="{x:Bind ViewModel.SizeIndex, Mode=TwoWay}">
+                        <x:String>Small</x:String>
+                        <x:String>Medium</x:String>
+                        <x:String>Large</x:String>
+                    </ComboBox>
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Reset appearance" Description="Theme, material, opacity, accent and size" Glyph="&#xE72C;">
+                    <Button Content="Reset" Command="{x:Bind ViewModel.ResetAppearanceCommand}" />
+                </controls:SettingsRow>
+
+                <!-- Widgets -->
+                <TextBlock Text="Widgets" Style="{StaticResource SectionHeaderStyle}" />
+                <controls:SettingsRow Header="Clock and date" Glyph="&#xE823;">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ShowClock, Mode=TwoWay}" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="24-hour clock" Description="Otherwise uses AM/PM" Glyph="&#xE916;">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.Use24HourClock, Mode=TwoWay}" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Show seconds" Glyph="&#xE916;">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ShowSeconds, Mode=TwoWay}" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="CPU" Description="Processor utility, as in Task Manager" Glyph="&#xE950;">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ShowCpu, Mode=TwoWay}" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Memory" Glyph="&#xE964;">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ShowMemory, Mode=TwoWay}" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="GPU" Description="Utilization, VRAM and temperature where the driver reports them" Glyph="&#xF211;">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ShowGpu, Mode=TwoWay}" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="GPU to show" Description="For PCs with more than one graphics adapter" Glyph="&#xF211;">
+                    <ComboBox ItemsSource="{x:Bind ViewModel.GpuAdapters}" SelectedIndex="{x:Bind ViewModel.GpuIndex, Mode=TwoWay}"
+                              MaxWidth="260" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Battery" Glyph="&#xEBAA;">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ShowBattery, Mode=TwoWay}" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Network" Description="Download and upload speed of physical adapters" Glyph="&#xE839;">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ShowNetwork, Mode=TwoWay}" />
+                </controls:SettingsRow>
+
+                <!-- Behavior -->
+                <TextBlock Text="Behavior" Style="{StaticResource SectionHeaderStyle}" />
+                <controls:SettingsRow Header="Keep on top" Description="Stay above other windows" Glyph="&#xE718;">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.AlwaysOnTop, Mode=TwoWay}" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Show in taskbar" Description="Otherwise the dashboard lives in the notification area" Glyph="&#xE7C4;">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.ShowInTaskbar, Mode=TwoWay}" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Launch at startup" Description="Start with Windows when you sign in" Glyph="&#xE7E8;">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.LaunchAtStartup, Mode=TwoWay}" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Update interval" Description="Longer intervals use less power" Glyph="&#xE916;">
+                    <ComboBox SelectedIndex="{x:Bind ViewModel.PollIntervalIndex, Mode=TwoWay}">
+                        <x:String>0.5 seconds</x:String>
+                        <x:String>1 second</x:String>
+                        <x:String>2 seconds</x:String>
+                        <x:String>5 seconds</x:String>
+                    </ComboBox>
+                </controls:SettingsRow>
+
+                <!-- About -->
+                <TextBlock Text="About" Style="{StaticResource SectionHeaderStyle}" />
+                <controls:SettingsRow Header="Desktop Dashboard" Description="{x:Bind ViewModel.Version}" Glyph="&#xE946;">
+                    <Button Content="Exit app" Command="{x:Bind ViewModel.ExitAppCommand}" />
+                </controls:SettingsRow>
+                <controls:SettingsRow Header="Settings file" Description="{x:Bind ViewModel.SettingsFilePath}" Glyph="&#xE8B7;">
+                    <Button Content="Show in folder" Command="{x:Bind ViewModel.OpenSettingsFolderCommand}" />
+                </controls:SettingsRow>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
