@@ -76,7 +76,7 @@ public sealed partial class SettingsViewModel : ObservableObject, IDisposable
     [ObservableProperty] public partial bool Use24HourClock { get; set; }
     [ObservableProperty] public partial bool ShowSeconds { get; set; }
     [ObservableProperty] public partial int GpuIndex { get; set; }
-    [ObservableProperty] public partial bool AlwaysOnTop { get; set; }
+    [ObservableProperty] public partial int LayerIndex { get; set; }
     [ObservableProperty] public partial bool ShowInTaskbar { get; set; }
     [ObservableProperty] public partial bool LaunchAtStartup { get; set; }
     [ObservableProperty] public partial int PollIntervalIndex { get; set; }
@@ -106,7 +106,7 @@ public sealed partial class SettingsViewModel : ObservableObject, IDisposable
             Use24HourClock = s.Use24HourClock;
             ShowSeconds = s.ShowSeconds;
             GpuIndex = Math.Max(0, GpuAdapters.FindIndex(n => string.Equals(n, s.GpuAdapter, StringComparison.OrdinalIgnoreCase)));
-            AlwaysOnTop = s.AlwaysOnTop;
+            LayerIndex = (int)s.Layer;
             ShowInTaskbar = s.ShowInTaskbar;
             LaunchAtStartup = s.LaunchAtStartup;
             PollIntervalIndex = Math.Max(0, Array.IndexOf(PollIntervals, s.PollIntervalMs));
@@ -164,7 +164,7 @@ public sealed partial class SettingsViewModel : ObservableObject, IDisposable
     partial void OnGpuIndexChanged(int value) =>
         Save(s => s.GpuAdapter = value <= 0 || value >= GpuAdapters.Count ? null : GpuAdapters[value]);
 
-    partial void OnAlwaysOnTopChanged(bool value) => Save(s => s.AlwaysOnTop = value);
+    partial void OnLayerIndexChanged(int value) => Save(s => s.Layer = (WindowLayer)value);
 
     partial void OnShowInTaskbarChanged(bool value) => Save(s => s.ShowInTaskbar = value);
 

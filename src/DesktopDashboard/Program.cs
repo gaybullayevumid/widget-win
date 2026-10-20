@@ -22,6 +22,10 @@ public static class Program
         {
             var activation = AppInstance.GetCurrent().GetActivatedEventArgs();
 
+            // This process was just started by the user, so it may take the foreground; pass
+            // that right on so the running instance can bring its window forward.
+            Services.NativeMethods.AllowSetForegroundWindow(mainInstance.ProcessId);
+
             // Redirect from a worker thread: blocking the STA thread on the async call can deadlock.
             Task.Run(() => mainInstance.RedirectActivationToAsync(activation).AsTask()).Wait();
             return 0;

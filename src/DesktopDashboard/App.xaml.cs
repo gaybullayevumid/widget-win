@@ -73,12 +73,12 @@ public partial class App : Application, IAppCommands
 
         tray.Initialize(new TrayActions(
             ToggleDashboard: () => _window.ToggleVisibility(),
-            ToggleAlwaysOnTop: () => settings.Update(s => s.AlwaysOnTop = !s.AlwaysOnTop),
+            ToggleAlwaysOnTop: () => settings.Update(s => s.Layer = s.Layer == WindowLayer.OnTop ? WindowLayer.Desktop : WindowLayer.OnTop),
             ToggleStartup: () => SetLaunchAtStartup(!startup.IsEnabled),
             OpenSettings: OpenSettings,
             Exit: Shutdown));
-        tray.Update(settings.Current.AlwaysOnTop, startup.IsEnabled);
-        settings.Changed += (_, _) => tray.Update(settings.Current.AlwaysOnTop, startup.IsEnabled);
+        tray.Update(settings.Current.Layer == WindowLayer.OnTop, startup.IsEnabled);
+        settings.Changed += (_, _) => tray.Update(settings.Current.Layer == WindowLayer.OnTop, startup.IsEnabled);
 
         dashboard.Start();
 

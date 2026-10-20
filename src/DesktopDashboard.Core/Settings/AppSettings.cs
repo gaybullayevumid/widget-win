@@ -23,6 +23,19 @@ public enum WidgetSize
     Large,
 }
 
+/// <summary>Where the widget sits in the window stack.</summary>
+public enum WindowLayer
+{
+    /// <summary>Always below other windows, like part of the desktop.</summary>
+    Desktop,
+
+    /// <summary>An ordinary window that comes forward when clicked.</summary>
+    Normal,
+
+    /// <summary>Always above other windows.</summary>
+    OnTop,
+}
+
 public sealed record WindowPlacement(int X, int Y, int Width, int Height);
 
 public sealed class CardVisibility
@@ -45,7 +58,7 @@ public sealed class AppSettings
 
     public WindowPlacement? Placement { get; set; }
 
-    public bool AlwaysOnTop { get; set; }
+    public WindowLayer Layer { get; set; } = WindowLayer.Desktop;
 
     public bool ShowInTaskbar { get; set; }
 

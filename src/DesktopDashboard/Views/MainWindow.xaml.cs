@@ -20,6 +20,7 @@ public sealed partial class MainWindow : Window
     private readonly SettingsService _settings;
     private readonly WidgetBackdrop _backdrop = new();
     private readonly UISettings _uiSettings = new();
+    private readonly WindowLayerController _layer;
     private bool _allowClose;
 
     public MainWindow(DashboardViewModel viewModel, SettingsService settings)
@@ -41,6 +42,7 @@ public sealed partial class MainWindow : Window
         AppWindow.Title = "Desktop Dashboard";
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico"));
         RestorePlacement();
+        _layer = new WindowLayerController(WinRT.Interop.WindowNative.GetWindowHandle(this));
 
         SystemBackdrop = _backdrop;
         ApplyAppearance();
@@ -56,12 +58,16 @@ public sealed partial class MainWindow : Window
 
     public event EventHandler? SettingsRequested;
 
+    /// <param name="activate">
+    /// True when the user explicitly asked for the widget; in desktop mode it then shows above
+    /// other windows until it loses focus. False keeps it on the desktop layer (sign-in start).
+    /// </param>
     public void ShowWidget(bool activate)
     {
         AppWindow.Show(activate);
         if (activate)
         {
-            NativeMethods.SetForegroundWindow(WinRT.Interop.WindowNative.GetWindowHandle(this));
+            _layer.BringForward();
         }
     }
 
@@ -80,6 +86,7 @@ public sealed partial class MainWindow : Window
     public void CloseForExit()
     {
         _allowClose = true;
+        _layer.Dispose();
         Close();
     }
 
@@ -156,12 +163,15 @@ public sealed partial class MainWindow : Window
             ? ParseHex(hex)
             : _uiSettings.GetColorValue(isDark ? UIColorType.AccentLight2 : UIColorType.AccentDark1);
 
-        PinIcon.Glyph = settings.AlwaysOnTop ? "" : "";
-        ToolTipService.SetToolTip(PinButton, settings.AlwaysOnTop ? "Stop keeping on top" : "Keep on top");
+        var onTop = settings.Layer == WindowLayer.OnTop;
+        PinIcon.Glyph = onTop ? "" : "";
+        ToolTipService.SetToolTip(PinButton, onTop ? "Stop keeping on top (back to desktop)" : "Keep on top");
         if (AppWindow.Presenter is OverlappedPresenter presenter)
         {
-            presenter.IsAlwaysOnTop = settings.AlwaysOnTop;
+            presenter.IsAlwaysOnTop = onTop;
         }
+
+        _layer.Apply(settings.Layer);
 
         AppWindow.IsShownInSwitchers = settings.ShowInTaskbar;
     }
@@ -173,7 +183,7 @@ public sealed partial class MainWindow : Window
     }
 
     private void OnPinClick(object sender, RoutedEventArgs e) =>
-        _settings.Update(s => s.AlwaysOnTop = !s.AlwaysOnTop);
+        _settings.Update(s => s.Layer = s.Layer == WindowLayer.OnTop ? WindowLayer.Desktop : WindowLayer.OnTop);
 
     private void OnSettingsClick(object sender, RoutedEventArgs e) => SettingsRequested?.Invoke(this, EventArgs.Empty);
 

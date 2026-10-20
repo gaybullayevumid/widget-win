@@ -113,8 +113,12 @@
 
                 <!-- Behavior -->
                 <TextBlock Text="Behavior" Style="{StaticResource SectionHeaderStyle}" />
-                <controls:SettingsRow Header="Keep on top" Description="Stay above other windows" Glyph="&#xE718;">
-                    <ToggleSwitch IsOn="{x:Bind ViewModel.AlwaysOnTop, Mode=TwoWay}" />
+                <controls:SettingsRow Header="Window position" Description="On desktop keeps the widget behind every other window" Glyph="&#xE718;">
+                    <ComboBox SelectedIndex="{x:Bind ViewModel.LayerIndex, Mode=TwoWay}">
+                        <x:String>On desktop</x:String>
+                        <x:String>Normal window</x:String>
+                        <x:String>Always on top</x:String>
+                    </ComboBox>
                 </controls:SettingsRow>
                 <controls:SettingsRow Header="Show in taskbar" Description="Otherwise the dashboard lives in the notification area" Glyph="&#xE7C4;">
                     <ToggleSwitch IsOn="{x:Bind ViewModel.ShowInTaskbar, Mode=TwoWay}" />

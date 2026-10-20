@@ -16,6 +16,16 @@ public sealed class JsonSettingsStoreTests : IDisposable
 
         Assert.Equal(1000, settings.PollIntervalMs);
         Assert.True(settings.Cards.Cpu);
+        Assert.Equal(WindowLayer.Desktop, settings.Layer);
+    }
+
+    [Fact]
+    public void Legacy_always_on_top_flag_is_ignored_and_widget_stays_on_desktop()
+    {
+        Directory.CreateDirectory(_dir);
+        File.WriteAllText(SettingsPath, """{ "alwaysOnTop": true }""");
+
+        Assert.Equal(WindowLayer.Desktop, new JsonSettingsStore(SettingsPath).Load().Layer);
     }
 
     [Fact]
@@ -25,7 +35,7 @@ public sealed class JsonSettingsStoreTests : IDisposable
         var original = new AppSettings
         {
             Placement = new WindowPlacement(10, 20, 300, 400),
-            AlwaysOnTop = true,
+            Layer = WindowLayer.OnTop,
             Theme = ThemePreference.Light,
             Backdrop = BackdropKind.Mica,
             AccentColor = "#FF8800",
@@ -40,7 +50,7 @@ public sealed class JsonSettingsStoreTests : IDisposable
         var loaded = store.Load();
 
         Assert.Equal(original.Placement, loaded.Placement);
-        Assert.True(loaded.AlwaysOnTop);
+        Assert.Equal(WindowLayer.OnTop, loaded.Layer);
         Assert.Equal(ThemePreference.Light, loaded.Theme);
         Assert.Equal(BackdropKind.Mica, loaded.Backdrop);
         Assert.Equal("#FF8800", loaded.AccentColor);
