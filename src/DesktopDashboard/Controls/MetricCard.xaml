@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="DesktopDashboard.Controls.MetricCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:DesktopDashboard.Controls"
+    PointerEntered="OnPointerEntered"
+    PointerExited="OnPointerExited"
+    PointerCanceled="OnPointerExited">
+
+    <Border x:Name="Chrome"
+            Background="{ThemeResource DashboardCardBackgroundBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="{StaticResource OverlayCornerRadius}"
+            ToolTipService.ToolTip="{x:Bind ViewModel.ToolTip, Mode=OneWay}">
+        <Border.ScaleTransition>
+            <Vector3Transition Duration="0:0:0.18" />
+        </Border.ScaleTransition>
+
+        <!-- Laid out at a fixed design height; the Viewbox scales it to the card size.
+             The width is matched to the card's aspect ratio in code so wide cards fill up. -->
+        <Viewbox Stretch="Uniform">
+            <Grid x:Name="Body" Width="176" Height="{x:Bind DesignHeight}" Padding="14,12,14,12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid ColumnSpacing="6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon FontSize="13" Glyph="{x:Bind ViewModel.Glyph, Mode=OneWay}"
+                              Foreground="{ThemeResource DashboardAccentBrush}" />
+                    <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.Title}" FontSize="12"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2"
+                                Visibility="{x:Bind controls:Converters.VisibleIfText(ViewModel.BadgeText), Mode=OneWay}">
+                        <FontIcon FontSize="11" Glyph="{x:Bind ViewModel.BadgeGlyph, Mode=OneWay}"
+                                  Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <TextBlock FontSize="11" Text="{x:Bind ViewModel.BadgeText, Mode=OneWay}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Value -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="3" Margin="0,4,0,0">
+                    <TextBlock Text="{x:Bind ViewModel.PrimaryText, Mode=OneWay}"
+                               FontFamily="Segoe UI Variable Display" FontWeight="SemiBold" FontSize="28"
+                               Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                    <TextBlock Text="{x:Bind ViewModel.PrimaryUnit, Mode=OneWay}"
+                               FontSize="13" Margin="0,0,0,6" VerticalAlignment="Bottom"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Text="{x:Bind ViewModel.SecondaryText, Mode=OneWay}" FontSize="11"
+                           TextTrimming="CharacterEllipsis"
+                           Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+
+                <!-- Trend or gauge -->
+                <controls:Sparkline Grid.Row="3" Margin="0,6,0,0"
+                                    Source="{x:Bind ViewModel.History}"
+                                    Maximum="{x:Bind ViewModel.HistoryMaximum}"
+                                    Stroke="{ThemeResource DashboardAccentBrush}"
+                                    Visibility="{x:Bind controls:Converters.VisibleIfNotNull(ViewModel.History)}" />
+                <ProgressBar Grid.Row="3" VerticalAlignment="Bottom" Margin="0,0,0,2"
+                             Minimum="0" Maximum="100"
+                             Value="{x:Bind controls:Converters.NanToZero(ViewModel.GaugeValue), Mode=OneWay}"
+                             Foreground="{ThemeResource DashboardAccentBrush}"
+                             Visibility="{x:Bind controls:Converters.VisibleIfNumber(ViewModel.GaugeValue), Mode=OneWay}" />
+            </Grid>
+        </Viewbox>
+    </Border>
+</UserControl>
