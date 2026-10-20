@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dxgi;
@@ -23,16 +22,22 @@ public static class GpuAdapters
 {
     private const uint DxgiAdapterFlagSoftware = 2;
 
-    /// <summary>Hardware adapters reported by DXGI (software renderers such as WARP are excluded).</summary>
-    public static IReadOnlyList<GpuAdapterInfo> Enumerate()
+    /// <summary>
+    /// Hardware adapters reported by DXGI (software renderers such as WARP are excluded).
+    /// Uses raw vtable calls rather than COM marshalling so it stays correct in trimmed builds.
+    /// </summary>
+    public static unsafe IReadOnlyList<GpuAdapterInfo> Enumerate()
     {
         var adapters = new List<GpuAdapterInfo>();
-        PInvoke.CreateDXGIFactory1<IDXGIFactory1>(out var factory).ThrowOnFailure();
+        var factoryId = IDXGIFactory1.IID_Guid;
+        IDXGIFactory1* factory;
+        PInvoke.CreateDXGIFactory1(&factoryId, (void**)&factory).ThrowOnFailure();
         try
         {
             for (uint i = 0; ; i++)
             {
-                var hr = factory.EnumAdapters1(i, out var adapter);
+                IDXGIAdapter1* adapter;
+                var hr = factory->EnumAdapters1(i, &adapter);
                 if (hr == HRESULT.DXGI_ERROR_NOT_FOUND)
                 {
                     break;
@@ -41,7 +46,7 @@ public static class GpuAdapters
                 hr.ThrowOnFailure();
                 try
                 {
-                    var desc = adapter.GetDesc1();
+                    var desc = adapter->GetDesc1();
                     if (((uint)desc.Flags & DxgiAdapterFlagSoftware) != 0)
                     {
                         continue;
@@ -53,13 +58,13 @@ public static class GpuAdapters
                 }
                 finally
                 {
-                    Marshal.ReleaseComObject(adapter);
+                    adapter->Release();
                 }
             }
         }
         finally
         {
-            Marshal.ReleaseComObject(factory);
+            factory->Release();
         }
 
         return adapters;
