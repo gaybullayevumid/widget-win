@@ -30,8 +30,8 @@ public partial class App : Application
         services.AddSingleton<ISettingsStore>(_ => new JsonSettingsStore(JsonSettingsStore.DefaultPath));
         services.AddSingleton<SettingsService>();
 
-        services.AddSingleton<IMetricSource<CpuSample>, NotImplementedSource<CpuSample>>();
-        services.AddSingleton<IMetricSource<MemorySample>, NotImplementedSource<MemorySample>>();
+        services.AddSingleton<IMetricSource<CpuSample>, CpuSource>();
+        services.AddSingleton<IMetricSource<MemorySample>, MemorySource>();
         services.AddSingleton<IMetricSource<GpuSample>, NotImplementedSource<GpuSample>>();
         services.AddSingleton<IMetricSource<BatterySample>, NotImplementedSource<BatterySample>>();
         services.AddSingleton<IMetricSource<NetworkSample>, NotImplementedSource<NetworkSample>>();
