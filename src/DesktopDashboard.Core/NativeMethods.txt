@@ -1,0 +1,7 @@
+GetIfTable2
+FreeMibTable
+IF_TYPE_SOFTWARE_LOOPBACK
+CreateDXGIFactory1
+IDXGIFactory1
+IDXGIAdapter1
+DXGI_ERROR_NOT_FOUND
