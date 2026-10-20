@@ -24,10 +24,14 @@ public sealed class JsonSettingsStore : ISettingsStore
         _path = path;
     }
 
-    public static string DefaultPath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "DesktopDashboard",
-        "settings.json");
+    /// <summary>%LOCALAPPDATA%\DesktopDashboard\settings.json, overridable for testing via DESKTOPDASHBOARD_SETTINGS.</summary>
+    public static string DefaultPath =>
+        Environment.GetEnvironmentVariable("DESKTOPDASHBOARD_SETTINGS") is { Length: > 0 } overridePath
+            ? overridePath
+            : Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "DesktopDashboard",
+                "settings.json");
 
     public AppSettings Load()
     {

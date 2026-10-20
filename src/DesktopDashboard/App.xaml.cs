@@ -32,7 +32,8 @@ public partial class App : Application
 
         services.AddSingleton<IMetricSource<CpuSample>, CpuSource>();
         services.AddSingleton<IMetricSource<MemorySample>, MemorySource>();
-        services.AddSingleton<IMetricSource<GpuSample>, NotImplementedSource<GpuSample>>();
+        services.AddSingleton<GpuSource>();
+        services.AddSingleton<IMetricSource<GpuSample>>(sp => sp.GetRequiredService<GpuSource>());
         services.AddSingleton<IMetricSource<BatterySample>, BatterySource>();
         services.AddSingleton<IMetricSource<NetworkSample>, NetworkSource>();
         services.AddSingleton<SystemMonitor>();
